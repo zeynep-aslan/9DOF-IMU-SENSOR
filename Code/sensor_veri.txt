@@ -1,0 +1,11 @@
+s1_accelx,
+s1_accely,
+s1_accelz,
+s1_gyrox,
+s1_gyroy,
+s1_gyroz,
+s1_magx,
+s1_magy,
+s1_magz,
+chargePercent, // cihazın şarj yüzdesini veriyor.
+chargePlug // cihazın şarja takılı olup olmadığını söylüyor.

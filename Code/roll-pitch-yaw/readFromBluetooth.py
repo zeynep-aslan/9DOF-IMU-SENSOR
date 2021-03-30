@@ -55,6 +55,15 @@ class Sensor:
         print(f"Magnetometer: {self.mag_x} - {self.mag_y} - {self.mag_z}")
         print("**************")
     """
+
+    # async def start(self, slow_platform=False):
+    #     data = await self.read_coro()
+    #     if len(data) == 2 or (self.expect_ts and len(data) == 3):
+    #         asyncio.create_task(self._update_nomag(slow_platform))
+    #     else:
+    #         asyncio.create_task(self._update_mag(slow_platform))
+
+
     # stopfunc: A function returning True when calibration is deemed complete: this could be a timer or an input from the user.
     def calibrate(self, getxyz, stopfunc, wait=0):  #  getxyz: A function returning a 3-tuple of magnetic x,y,z values.
         magmax = list(getxyz())             # Initialise max and min lists with current values
@@ -70,7 +79,7 @@ class Sensor:
                 magmax[x] = max(magmax[x], magxyz[x])
                 magmin[x] = min(magmin[x], magxyz[x])
         self.magbias = tuple(map(lambda a, b: (a +b)/2, magmin, magmax))
-
+    """
     def update_nomag(self, data, ts=None):    # 3-tuples (x, y, z) for accel, gyro
         # ax, ay, az = accel                  # Units G (but later normalised)
         # gx, gy, gz = (radians(x) for x in gyro) # Units deg/s
@@ -133,15 +142,15 @@ class Sensor:
         self.pitch = degrees(-asin(2.0 * (self.q[1] * self.q[3] - self.q[0] * self.q[2])))
         self.roll = degrees(atan2(2.0 * (self.q[0] * self.q[1] + self.q[2] * self.q[3]),
             self.q[0] * self.q[0] - self.q[1] * self.q[1] - self.q[2] * self.q[2] + self.q[3] * self.q[3]))
-
+    """
     def update(self, data, ts=None):     # 3-tuples (x, y, z) for accel, gyro and mag data
         # mx, my, mz = (mag[x] - self.magbias[x] for x in range(3)) # Units irrelevant (normalised)
         # ax, ay, az = accel                  # Units irrelevant (normalised)
         # gx, gy, gz = (radians(x) for x in gyro)  # Units deg/s
 
-        gyro = data[3], data[4], data[5]
-        mag = data[6], data[7], data[8]
-        ax, ay, az = data[0], data[1], data[2]
+        gyro = float(data[3]), float(data[4]), float(data[5])
+        mag = float(data[6]), float(data[7]), float(data[8])
+        ax, ay, az = float(data[0]), float(data[1]), float(data[2])
         gx, gy, gz = (radians(x) for x in gyro) # Units deg/s
         mx, my, mz = (mag[x] - self.magbias[x] for x in range(3))
 
@@ -261,6 +270,7 @@ if __name__ == "__main__":
             # s1.displaySensorData()
             # time.sleep(.3)
             # s1.visualization()
+            s1.update(data)
             s1.printRPY()
             if time.time() - start > 30:
                 ser.close()

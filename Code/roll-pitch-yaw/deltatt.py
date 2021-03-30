@@ -36,28 +36,12 @@
 # On 1st pass dt evidently can't be computed. A notional value of 100μs is
 # returned. The Madgwick algorithm takes seconds to stabilise.
 
-
 try:
     import utime as time
-    print("aa")
 except ImportError:
     import time
-    print("bb")
-
-# import time
-
 
 is_micropython = hasattr(time, 'ticks_diff')
-print("is_micropython: ", is_micropython)
-# async def start(self, slow_platform=False):
-#     data = await self.read_coro()
-#     if len(data) == 2 or (self.expect_ts and len(data) == 3):
-#         asyncio.create_task(self._update_nomag(slow_platform))
-#     else:
-#         asyncio.create_task(self._update_mag(slow_platform))
-
-# def TimeDiff(start, end):
-#     return (start - end)/1000000
 
 class DeltaT():
     def __init__(self, timediff):
@@ -66,33 +50,7 @@ class DeltaT():
             if is_micropython:
                 self.timediff = lambda start, end : time.ticks_diff(start, end)/1000000
             else:
-                # def TimeDiff(start, end):
-                #     return (start - end)/1000000
-                # self.timediff = lambda start, end : time.ticks_diff(start, end)/1000000
-
                 raise ValueError('You must define a timediff function')
-
-            # Test of supplying a timediff
-            # if is_micropython:
-            #     def TimeDiff(start, end):
-            #         return time.ticks_diff(start, end)/1000000
-            # else:  # Cpython cheat: test data does not roll over
-            #     def TimeDiff(start, end):
-            #         return (start - end)/1000000
-
-
-
-            # if is_micropython:
-            #     def TimeDiff(start, end):
-            #         return time.ticks_diff(start, end)/1000000
-            # else:  # Cpython cheat: test data does not roll over
-
-                # self.timediff = lambda start, end : time.ticks_diff(start, end)/1000000
-
-                # def TimeDiff(start, end):
-                #     self.timediff = TimeDiff(start, end)  
-                #     return (start - end)/1000000
-
         else:
             self.expect_ts = True
             self.timediff = timediff

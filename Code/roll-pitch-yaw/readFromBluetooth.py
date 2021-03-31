@@ -5,17 +5,19 @@ import matplotlib.pyplot as plt
 import threading
 
 from math import sqrt, atan2, asin, degrees, radians
-from deltat import DeltaT
+# from deltat import DeltaT
+# from deltat import is_micropython
 
 class Sensor:
     
     declination = 0                         # Optional offset for true north. A +ve value adds to heading
-    def __init__(self, data, timediff=None):
+            
+    def __init__(self, data, end):
         self.data = data
         # self.accel_x, self.accel_y, self.accel_z, self.gyro_x, self.gyro_y, self.gyro_z, self.mag_x, self.mag_y, self.mag_z = "","","","","","","","","",
 
         self.magbias = (0, 0, 0)            # local magnetic bias factors: set from calibration
-        self.deltat = DeltaT(timediff)      # Time between updates
+        self.deltat = end      # Time between updates
         self.q = [1.0, 0.0, 0.0, 0.0]       # vector to hold quaternion
         GyroMeasError = radians(40)         # Original code indicates this leads to a 2 sec response time
         self.beta = sqrt(3.0 / 4.0) * GyroMeasError  # compute beta (see README)
@@ -234,7 +236,7 @@ class Sensor:
         qDot4 = 0.5 * (q1 * gz + q2 * gy - q3 * gx) - self.beta * s4
 
         # Integrate to yield quaternion
-        deltat = self.deltat(ts)
+        deltat = start
         q1 += qDot1 * deltat
         q2 += qDot2 * deltat
         q3 += qDot3 * deltat
@@ -253,25 +255,37 @@ class Sensor:
         print("yaw: ", self.heading)
 
 
-
 if __name__ == "__main__":
     ser = serial.Serial('COM5', 115200, timeout=0,
                                 parity=serial.PARITY_EVEN, rtscts=1)
     print(ser.is_open)
     print(ser.name)
-    start = time.time()
+    # Test of supplying a timediff
+    # if is_micropython:
+    #     def TimeDiff(start, end):
+    #         return time.ticks_diff(start, end)/1000000
+    # else:  # Cpython cheat: test data does not roll over
+    #     def TimeDiff(start, end):
+    #         return (start - end)/1000000
+
+    # start = time.time()
+    end = 0
     while(1):
         data = ser.readline().decode('Ascii')
         data = data.split(',')
+        
         if len(data)==11:
             # print(data)
-            s1 = Sensor(data)
+            start = time.time()
+            s1 = Sensor(data, end)
             time.sleep(.1)
             # s1.displaySensorData()
-            # time.sleep(.3)
+            # time.sleep(.3) 
             # s1.visualization()
-            s1.update(data)
+            s1.update(data, end)
             s1.printRPY()
+            # print(end)
+            end = time.time() - start
             if time.time() - start > 30:
                 ser.close()
                 print(ser.is_open)

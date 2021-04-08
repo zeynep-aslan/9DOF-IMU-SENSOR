@@ -256,7 +256,7 @@ class Sensor:
 
 
 if __name__ == "__main__":
-    ser = serial.Serial('COM5', 115200, timeout=0,
+    ser = serial.Serial('COM6', 115200, timeout=0,
                                 parity=serial.PARITY_EVEN, rtscts=1)
     print(ser.is_open)
     print(ser.name)
@@ -271,6 +271,7 @@ if __name__ == "__main__":
     # start = time.time()
     end = 0
     while(1):
+        ser.reset_input_buffer()
         data = ser.readline().decode('Ascii')
         data = data.split(',')
         

@@ -284,7 +284,7 @@ for i in range(100):
 	magPsiValues.append(calMagEuler.item((2,0)))
 	time.sleep(.009)
 magCorrectionMean = np.mean(magPsiValues)
-print(magCorrectionMean)
+# print(magCorrectionMean)
 gyroRollCorrection = np.mean(gyroRoll)
 gyroPitchCorrection = np.mean(gyroPitch)
 gyroYawCorrection = np.mean(gyroYaw)
@@ -347,12 +347,13 @@ def data_collect():
 		data = ser.readline().decode('Ascii').replace('\r\n', '').split(',')
 		ser.reset_input_buffer()
 		data_ = data[:9]
-		isThereEmptyValue = [True if x != "" else False for x in data_]
+		isThereEmptyValue = [True if x != "" and x != "-" else False for x in data_]
 		isThere = False in isThereEmptyValue
+        # isThereHyphen = 
 		if len(data)>8 and not isThere:
 			sensorValues = getData(data, currentTime, gyroRollCorrection, gyroPitchCorrection, gyroYawCorrection)
-			print(currentTime)
-			
+			# print(currentTime)
+			print(sensorValues[1:])
 			if (len(times) >= 2): #does a dt exist yet?
 				dt_gyro = times[-1] - times[-2]
 			
